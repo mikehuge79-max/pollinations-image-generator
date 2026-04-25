@@ -171,3 +171,68 @@ label {
   margin-top: 1.25rem;
   font-size: .85rem;
 }
+
+/* ── Main App ── */
+.app-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--clr-surface);
+  border-bottom: 1px solid var(--clr-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header .logo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.app-body {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 0;
+  flex: 1;
+}
+
+.controls-panel {
+  padding: 1.5rem;
+  border-right: 1px solid var(--clr-border);
+  overflow-y: auto;
+  max-height: calc(100vh - 57px);
+  position: sticky;
+  top: 57px;
+}
+
+.output-panel {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.section-title {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--clr-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 1rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .app-body { grid-template-columns: 1fr; }
+  .controls-panel { max-height: none; position: static; border-right: none; border-bottom: 1px solid var(--clr-border); }
+}
