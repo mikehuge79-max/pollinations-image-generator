@@ -236,3 +236,61 @@ label {
   .app-body { grid-template-columns: 1fr; }
   .controls-panel { max-height: none; position: static; border-right: none; border-bottom: 1px solid var(--clr-border); }
 }
+
+/* ── Controls ── */
+.ratio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .4rem;
+  margin-bottom: 1rem;
+}
+
+.ratio-btn {
+  background: var(--clr-bg);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-muted);
+  padding: .45rem .3rem;
+  font-size: .78rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+.ratio-btn:hover { border-color: var(--clr-accent); color: var(--clr-accent); }
+.ratio-btn.active { border-color: var(--clr-accent); color: var(--clr-accent); background: rgba(192,132,252,.1); }
+
+.seed-row {
+  display: flex;
+  gap: .4rem;
+}
+.seed-row input { flex: 1; }
+.seed-row button {
+  background: var(--clr-bg);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-muted);
+  padding: 0 .6rem;
+  font-size: 1rem;
+  border-radius: var(--radius-sm);
+}
+.seed-row button:hover { border-color: var(--clr-accent); }
+
+.toggle-group { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .85rem;
+  color: var(--clr-text);
+  cursor: pointer;
+  text-transform: none;
+  font-weight: normal;
+  letter-spacing: 0;
+  margin: 0;
+}
+.toggle-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--clr-accent);
+  cursor: pointer;
+}
+
+.hint { font-size: .75rem; color: var(--clr-muted); font-weight: 400; }
