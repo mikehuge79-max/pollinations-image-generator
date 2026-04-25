@@ -299,3 +299,23 @@ function updateCharCount() {
 }
 promptInput.addEventListener('input', updateCharCount);
 updateCharCount();
+
+// ── Dimension input validation ─────────────────────────
+function clampDimension(input) {
+  let v = parseInt(input.value) || 1024;
+  v = Math.max(64, Math.min(2048, v));
+  // Round to nearest 64 for better compatibility
+  v = Math.round(v / 64) * 64;
+  input.value = v;
+}
+
+widthInput.addEventListener('blur',  () => clampDimension(widthInput));
+heightInput.addEventListener('blur', () => clampDimension(heightInput));
+
+// De-activate ratio preset if user manually edits dimensions
+[widthInput, heightInput].forEach(inp => {
+  inp.addEventListener('input', () => {
+    document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.ratio-btn[data-w="0"]').classList.add('active');
+  });
+});
