@@ -150,3 +150,26 @@ function setLoading(active) {
   btnText.classList.toggle('hidden', active);
   btnLoading.classList.toggle('hidden', !active);
 }
+
+// ── DOM: output panel ───────────────────────────────────
+const placeholder   = document.getElementById('placeholder');
+const loadingBox    = document.getElementById('loading-box');
+const imageResult   = document.getElementById('image-result');
+const generatedImg  = document.getElementById('generated-img');
+const downloadBtn   = document.getElementById('download-btn');
+const regenBtn      = document.getElementById('regen-btn');
+const errorBox      = document.getElementById('error-box');
+const errorMsg      = document.getElementById('error-msg');
+
+function showOutput(state) {
+  // state: 'placeholder' | 'loading' | 'image' | 'error'
+  placeholder.classList.toggle('hidden', state !== 'placeholder');
+  loadingBox.classList.toggle('hidden',  state !== 'loading');
+  imageResult.classList.toggle('hidden', state !== 'image');
+  errorBox.classList.toggle('hidden',    state !== 'error');
+}
+
+function showError(msg) {
+  errorMsg.textContent = msg;
+  showOutput('error');
+}
