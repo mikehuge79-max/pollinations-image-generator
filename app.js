@@ -173,3 +173,25 @@ function showError(msg) {
   errorMsg.textContent = msg;
   showOutput('error');
 }
+
+// ── Build image URL ─────────────────────────────────────
+function buildImageUrl(params) {
+  const { prompt, model, width, height, seed, enhance, nologo, apiKey } = params;
+  const encoded = encodeURIComponent(prompt.trim());
+  const base    = `https://image.pollinations.ai/prompt/${encoded}`;
+
+  const qs = new URLSearchParams({
+    model,
+    width:   Math.max(64, Math.min(2048, parseInt(width)  || 1024)),
+    height:  Math.max(64, Math.min(2048, parseInt(height) || 1024)),
+    nologo:  nologo  ? 'true' : 'false',
+    enhance: enhance ? 'true' : 'false',
+    key:     apiKey,
+  });
+
+  if (seed && seed.toString().trim() !== '') {
+    qs.set('seed', parseInt(seed));
+  }
+
+  return `${base}?${qs.toString()}`;
+}
