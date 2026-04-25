@@ -102,3 +102,51 @@ resetKeyBtn.addEventListener('click', () => {
     showSetupScreen();
   }
 })();
+
+// ── DOM: form controls ──────────────────────────────────
+const promptInput   = document.getElementById('prompt');
+const modelSelect   = document.getElementById('model');
+const widthInput    = document.getElementById('width');
+const heightInput   = document.getElementById('height');
+const seedInput     = document.getElementById('seed');
+const enhanceChk    = document.getElementById('enhance');
+const nologoChk     = document.getElementById('nologo');
+const randomizeBtn  = document.getElementById('randomize-seed');
+const generateBtn   = document.getElementById('generate-btn');
+const btnText       = document.getElementById('btn-text');
+const btnLoading    = document.getElementById('btn-loading');
+
+// ── Aspect ratio presets ────────────────────────────────
+document.querySelectorAll('.ratio-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const w = parseInt(btn.dataset.w);
+    const h = parseInt(btn.dataset.h);
+
+    if (w > 0 && h > 0) {
+      widthInput.value  = w;
+      heightInput.value = h;
+      widthInput.disabled  = true;
+      heightInput.disabled = true;
+    } else {
+      // Custom: enable manual editing
+      widthInput.disabled  = false;
+      heightInput.disabled = false;
+      widthInput.focus();
+    }
+  });
+});
+
+// ── Randomize seed ──────────────────────────────────────
+randomizeBtn.addEventListener('click', () => {
+  seedInput.value = Math.floor(Math.random() * 2147483647);
+});
+
+// ── Set loading state ───────────────────────────────────
+function setLoading(active) {
+  generateBtn.disabled = active;
+  btnText.classList.toggle('hidden', active);
+  btnLoading.classList.toggle('hidden', !active);
+}
