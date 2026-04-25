@@ -251,3 +251,31 @@ async function generateImage() {
 
 generateBtn.addEventListener('click', generateImage);
 regenBtn.addEventListener('click', generateImage);
+
+// ── Download generated image ────────────────────────────
+downloadBtn.addEventListener('click', async () => {
+  const src = generatedImg.src;
+  if (!src) return;
+
+  downloadBtn.textContent = '⏳ Preparing…';
+  downloadBtn.disabled = true;
+
+  try {
+    const response = await fetch(src);
+    const blob     = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href     = objectUrl;
+    a.download = `pollinations-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(objectUrl);
+  } catch {
+    alert('Download failed. Right-click the image to save it manually.');
+  } finally {
+    downloadBtn.textContent = '⬇ Download';
+    downloadBtn.disabled = false;
+  }
+});
