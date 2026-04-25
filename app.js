@@ -195,3 +195,59 @@ function buildImageUrl(params) {
 
   return `${base}?${qs.toString()}`;
 }
+
+// ── Generate image ──────────────────────────────────────
+async function generateImage() {
+  const prompt = promptInput.value.trim();
+  if (!prompt) {
+    showError('Please enter a prompt before generating.');
+    return;
+  }
+
+  const apiKey = loadApiKey();
+  if (!apiKey) {
+    clearApiKey();
+    showSetupScreen();
+    return;
+  }
+
+  const params = {
+    prompt,
+    model:   modelSelect.value,
+    width:   widthInput.value,
+    height:  heightInput.value,
+    seed:    seedInput.value,
+    enhance: enhanceChk.checked,
+    nologo:  nologoChk.checked,
+    apiKey,
+  };
+
+  setLoading(true);
+  showOutput('loading');
+
+  try {
+    const url = buildImageUrl(params);
+
+    // Load the image through an Image element so we get proper error events
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        generatedImg.src = url;
+        resolve();
+      };
+      img.onerror = () => reject(new Error('Image generation failed. Check your API key or try a different prompt.'));
+      img.src = url;
+    });
+
+    // Store URL for download
+    generateBtn.dataset.lastUrl = url;
+    showOutput('image');
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+generateBtn.addEventListener('click', generateImage);
+regenBtn.addEventListener('click', generateImage);
