@@ -1,0 +1,33 @@
+/* ── Reset & Variables ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --clr-bg:       #0f0f13;
+  --clr-surface:  #18181f;
+  --clr-card:     #1e1e28;
+  --clr-border:   #2c2c3a;
+  --clr-accent:   #c084fc;
+  --clr-accent2:  #818cf8;
+  --clr-text:     #e2e2f0;
+  --clr-muted:    #8888a8;
+  --clr-error:    #f87171;
+  --clr-success:  #4ade80;
+  --radius:       12px;
+  --radius-sm:    8px;
+  --shadow:       0 4px 24px rgba(0,0,0,.5);
+  --transition:   .2s ease;
+  --font:         'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+a { color: var(--clr-accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.hidden { display: none !important; }
