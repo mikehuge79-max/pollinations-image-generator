@@ -319,3 +319,24 @@ heightInput.addEventListener('blur', () => clampDimension(heightInput));
     document.querySelector('.ratio-btn[data-w="0"]').classList.add('active');
   });
 });
+
+// ── Model descriptions ──────────────────────────────────
+const MODEL_INFO = {
+  'flux':          'Default Flux — fast, balanced quality for general use.',
+  'flux-realism':  'Flux Realism — photorealistic images, best for portraits and landscapes.',
+  'flux-3d':       'Flux 3D — renders with a three-dimensional depth effect.',
+  'flux-anime':    'Flux Anime — anime, manga, and illustration style.',
+  'flux-pro':      'Flux Pro — highest quality output, slower generation.',
+  'turbo':         'Turbo — fastest generation, lower detail.',
+  'any-dark':      'Any Dark — cinematic dark aesthetic and moody scenes.',
+};
+
+const modelInfo = document.createElement('p');
+modelInfo.style.cssText = 'font-size:.76rem;color:var(--clr-muted);margin-top:.35rem;min-height:1.1em;';
+modelSelect.parentElement.appendChild(modelInfo);
+
+function updateModelInfo() {
+  modelInfo.textContent = MODEL_INFO[modelSelect.value] || '';
+}
+modelSelect.addEventListener('change', updateModelInfo);
+updateModelInfo();
