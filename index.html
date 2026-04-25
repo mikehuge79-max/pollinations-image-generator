@@ -3,10 +3,154 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pollinations Image Generator</title>
+  <title>🌸 Pollinations Image Generator</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Pollinations Image Generator</h1>
-  <p>Loading...</p>
+
+  <!-- ╔══════════════════════════════╗
+       ║  API Key Setup Screen        ║
+       ╚══════════════════════════════╝ -->
+  <div id="setup-screen" class="setup-screen">
+    <div class="setup-card">
+      <div class="setup-logo">🌸</div>
+      <h1>Image Generator</h1>
+      <p>Powered by Pollinations.ai · Enter your publishable API key to begin</p>
+      <div class="setup-input-row">
+        <input type="password" id="api-key-input"
+               placeholder="pk_xxxxxxxxxxxx" autocomplete="off" />
+        <button id="save-key-btn">Save →</button>
+      </div>
+      <p class="setup-hint" id="key-error" style="color:#f87171;display:none"></p>
+      <p class="setup-hint">Your key is stored locally on this device only and is never sent to our servers.</p>
+      <a class="setup-link" href="https://enter.pollinations.ai" target="_blank">
+        Get your free API key →
+      </a>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════╗
+       ║  Main Application            ║
+       ╚══════════════════════════════╝ -->
+  <div id="main-app" class="app-wrapper hidden">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">🌸 <span>Pollinations Image Generator</span></div>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span class="key-badge" id="key-badge">🔑 key loaded</span>
+        <button class="btn-ghost" id="reset-key-btn">Change key</button>
+      </div>
+    </header>
+
+    <!-- Body: sidebar + output -->
+    <div class="app-body">
+
+      <!-- Left: controls -->
+      <div class="controls-panel">
+        <div class="section-title">Prompt</div>
+
+        <div class="form-group">
+          <label for="prompt">Describe your image</label>
+          <textarea id="prompt" rows="4"
+            placeholder="A photorealistic sunset over a mountain lake, golden hour, cinematic, 8K..."></textarea>
+        </div>
+
+        <div class="section-title">Model</div>
+
+        <div class="form-group">
+          <label for="model">AI Model</label>
+          <select id="model">
+            <option value="flux">Flux — Default, balanced quality</option>
+            <option value="flux-realism">Flux Realism — Photorealistic</option>
+            <option value="flux-3d">Flux 3D — 3D renders</option>
+            <option value="flux-anime">Flux Anime — Anime / illustration</option>
+            <option value="flux-pro">Flux Pro — Highest quality</option>
+            <option value="turbo">Turbo — Fast generation</option>
+            <option value="any-dark">Any Dark — Dark aesthetic</option>
+          </select>
+        </div>
+
+        <div class="section-title">Dimensions</div>
+
+        <div class="form-group">
+          <label>Aspect Ratio Preset</label>
+          <div class="ratio-grid">
+            <button class="ratio-btn active" data-w="1024" data-h="1024">1 : 1</button>
+            <button class="ratio-btn" data-w="1280" data-h="720">16 : 9</button>
+            <button class="ratio-btn" data-w="720" data-h="1280">9 : 16</button>
+            <button class="ratio-btn" data-w="1024" data-h="768">4 : 3</button>
+            <button class="ratio-btn" data-w="768" data-h="1024">3 : 4</button>
+            <button class="ratio-btn" data-w="0" data-h="0">Custom</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="width">Width (px)</label>
+            <input type="number" id="width" value="1024" min="64" max="2048" step="64" />
+          </div>
+          <div class="form-group">
+            <label for="height">Height (px)</label>
+            <input type="number" id="height" value="1024" min="64" max="2048" step="64" />
+          </div>
+        </div>
+
+        <div class="section-title">Advanced</div>
+
+        <div class="form-group">
+          <label for="seed">Seed <span class="hint">(blank = random)</span></label>
+          <div class="seed-row">
+            <input type="number" id="seed" placeholder="Random" min="0" />
+            <button id="randomize-seed" title="Randomize seed">🎲</button>
+          </div>
+        </div>
+
+        <div class="toggle-group form-group">
+          <label class="toggle-label">
+            <input type="checkbox" id="enhance" />
+            <span>Enhance prompt with AI</span>
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" id="nologo" checked />
+            <span>Remove Pollinations watermark</span>
+          </label>
+        </div>
+
+        <button class="btn-primary" id="generate-btn">
+          <span id="btn-text">✨ Generate Image</span>
+          <span id="btn-loading" class="hidden">⏳ Generating…</span>
+        </button>
+      </div><!-- /controls-panel -->
+
+      <!-- Right: output -->
+      <div class="output-panel">
+        <div id="placeholder" class="placeholder">
+          <div class="placeholder-icon">🎨</div>
+          <p>Your generated image will appear here</p>
+        </div>
+
+        <div id="loading-box" class="loading-box hidden">
+          <div class="spinner"></div>
+          <p>Generating your image…</p>
+        </div>
+
+        <div id="image-result" class="image-result hidden">
+          <img id="generated-img" src="" alt="Generated image" />
+          <div class="image-actions">
+            <button class="btn-primary" id="download-btn">⬇ Download</button>
+            <button class="btn-secondary" id="regen-btn">🔄 Regenerate</button>
+          </div>
+        </div>
+
+        <div id="error-box" class="error-box hidden">
+          <p id="error-msg"></p>
+        </div>
+      </div><!-- /output-panel -->
+
+    </div><!-- /app-body -->
+  </div><!-- /main-app -->
+
+  <script src="app.js"></script>
 </body>
 </html>
