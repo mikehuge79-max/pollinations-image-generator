@@ -279,3 +279,23 @@ downloadBtn.addEventListener('click', async () => {
     downloadBtn.disabled = false;
   }
 });
+
+// ── Keyboard shortcut: Ctrl/Cmd + Enter to generate ────
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    if (!generateBtn.disabled) generateImage();
+  }
+});
+
+// ── Prompt character counter ────────────────────────────
+const charCounter = document.createElement('small');
+charCounter.style.cssText = 'float:right;font-size:.72rem;color:var(--clr-muted);';
+promptInput.parentElement.querySelector('label').appendChild(charCounter);
+
+function updateCharCount() {
+  const len = promptInput.value.length;
+  charCounter.textContent = `${len} / 500`;
+  charCounter.style.color = len > 450 ? 'var(--clr-error)' : 'var(--clr-muted)';
+}
+promptInput.addEventListener('input', updateCharCount);
+updateCharCount();
