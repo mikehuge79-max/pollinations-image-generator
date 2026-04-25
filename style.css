@@ -102,3 +102,72 @@ label {
   border: 1px solid var(--clr-border);
 }
 .btn-ghost:hover { color: var(--clr-text); border-color: var(--clr-text); }
+
+/* ── Setup / API Key Screen ── */
+.setup-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: radial-gradient(ellipse at 50% 0%, #2d1b4e 0%, var(--clr-bg) 60%);
+}
+
+.setup-card {
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.setup-logo {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.setup-card h1 {
+  font-size: 1.5rem;
+  margin-bottom: .5rem;
+  background: linear-gradient(135deg, var(--clr-accent), var(--clr-accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.setup-card p {
+  color: var(--clr-muted);
+  margin-bottom: 1.5rem;
+  font-size: .9rem;
+}
+
+.setup-input-row {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+.setup-input-row input { flex: 1; }
+.setup-input-row button {
+  background: linear-gradient(135deg, var(--clr-accent), var(--clr-accent2));
+  color: #fff;
+  padding: .55rem 1.1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+}
+.setup-input-row button:hover { opacity: .9; }
+
+.setup-hint {
+  font-size: .75rem;
+  color: var(--clr-muted);
+  margin-top: .5rem;
+}
+
+.setup-link {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-size: .85rem;
+}
