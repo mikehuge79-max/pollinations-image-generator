@@ -60,14 +60,32 @@
 
         <div class="form-group">
           <label for="model">AI Model</label>
-          <select id="model">
-            <option value="flux">Flux — Default, balanced quality</option>
-            <option value="flux-realism">Flux Realism — Photorealistic</option>
-            <option value="flux-3d">Flux 3D — 3D renders</option>
-            <option value="flux-anime">Flux Anime — Anime / illustration</option>
-            <option value="flux-pro">Flux Pro — Highest quality</option>
-            <option value="turbo">Turbo — Fast generation</option>
-            <option value="any-dark">Any Dark — Dark aesthetic</option>
+                    <select id="model">
+            <optgroup label="Free Models">
+              <option value="flux">Flux Schnell — fast, balanced quality</option>
+              <option value="zimage">Z-Image Turbo — high-speed generation</option>
+              <option value="p-image">Pruna p-image — lightweight &amp; efficient</option>
+              <option value="klein">FLUX.2 Klein K8 — compact Flux variant</option>
+              <option value="gptimage">GPT Image 1 Mini — OpenAI compact image</option>
+              <option value="nanobanana">NanoBanana — ultra-fast nano model</option>
+              <option value="nanobanana-2">NanoBanana 2 — improved nano generation</option>
+              <option value="qwen-image">Qwen Image Plus — Alibaba's image model</option>
+              <option value="seedream5">Seedream 5.0 Lite — lightweight dream model</option>
+              <option value="seedream">Seedream — dream-style generation</option>
+              <option value="gpt-image-2">GPT Image 2 — OpenAI image model v2</option>
+              <option value="wan-image">Wan 3.7 Image — advanced image synthesis</option>
+              <option value="gptimage-large">GPT Image 1.5 — OpenAI larger image model</option>
+            </optgroup>
+            <optgroup label="Paid Models 💳">
+              <option value="p-image-edit">Pruna p-image-edit (PAID) — image editing</option>
+              <option value="grok-imagine">Grok Imagine (PAID) — xAI image generation</option>
+              <option value="kontext">FLUX.1 Kontext (PAID) — context-aware Flux</option>
+              <option value="nova-canvas">Nova Canvas (PAID) — Amazon Nova image</option>
+              <option value="grok-imagine-pro">Grok Imagine Pro (PAID) — xAI pro quality</option>
+              <option value="nanobanana-pro">NanoBanana Pro (PAID) — premium nano model</option>
+              <option value="wan-image-pro">Wan 3.7 Image Pro (PAID) — pro synthesis</option>
+              <option value="seedream-pro">Seedream Pro (PAID) — premium dream model</option>
+            </optgroup>
           </select>
         </div>
 
