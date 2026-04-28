@@ -7,7 +7,7 @@ A polished, browser-based UI for generating AI images with the [Pollinations.ai]
 | Feature | Details |
 |---------|---------|
 | 🔑 Secure key storage | XOR-obfuscated, base64-encoded in `localStorage` |
-| 🖼️ 21 AI models | Full current Pollinations.ai model list (free + paid) |
+| 🖼️ 21 AI models | 10 free + 11 paid — full current Pollinations.ai list |
 | 📐 Ratio presets | 1:1 · 16:9 · 9:16 · 4:3 · 3:4 · Custom |
 | 🎲 Seed control | Reproducible images or random |
 | ✨ Prompt enhance | AI-improved prompts via Pollinations |
@@ -25,33 +25,33 @@ A polished, browser-based UI for generating AI images with the [Pollinations.ai]
 
 ### Free Models
 
-| Display Name | API Value | Badge |
+| Display Name | API Value | Notes |
 |---|---|---|
-| Flux Schnell | `flux` | — |
-| Z-Image Turbo | `zimage` | — |
-| Pruna p-image | `p-image` | — |
-| FLUX.2 Klein K8 | `klein` | PLUS |
-| GPT Image 1 Mini | `gptimage` | PRO |
-| NanoBanana | `nanobanana` | — |
-| NanoBanana 2 | `nanobanana-2` | — |
-| Qwen Image Plus | `qwen-image` | — |
-| Seedream 5.0 Lite | `seedream5` | — |
-| Seedream | `seedream` | — |
-| GPT Image 2 | `gpt-image-2` | NEW |
-| Wan 3.7 Image | `wan-image` | NEW |
-| GPT Image 1.5 | `gptimage-large` | PRO |
+| Flux Schnell | `flux` | Default — fast & balanced |
+| Z-Image Turbo | `zimage` | High-speed generation |
+| FLUX.2 Klein 4B | `klein` | Alpha variant |
+| GPT Image 1 Mini | `gptimage` | OpenAI — PRO plan |
+| Qwen Image Plus | `qwen-image` | Alibaba model |
+| GPT Image 2 | `gpt-image-2` | OpenAI v2 — new |
+| Wan 2.7 Image | `wan-image` | New model |
+| GPT Image 1.5 | `gptimage-large` | OpenAI — PRO plan |
+| FLUX.1 Kontext | `kontext` | Context-aware Flux |
+| Seedream | `seedream` | Dream-style artistic |
 
 ### Paid Models 💳
 
 | Display Name | API Value |
 |---|---|
+| Pruna p-image (PAID) | `p-image` |
 | Pruna p-image-edit (PAID) | `p-image-edit` |
 | Grok Imagine (PAID) | `grok-imagine` |
-| FLUX.1 Kontext (PAID) | `kontext` |
+| NanoBanana (PAID) | `nanobanana` |
 | Nova Canvas (PAID) | `nova-canvas` |
+| Seedream 5.0 Lite (PAID) | `seedream5` |
+| NanoBanana 2 (PAID) | `nanobanana-2` |
 | Grok Imagine Pro (PAID) | `grok-imagine-pro` |
+| Wan 2.7 Image Pro (PAID) | `wan-image-pro` |
 | NanoBanana Pro (PAID) | `nanobanana-pro` |
-| Wan 3.7 Image Pro (PAID) | `wan-image-pro` |
 | Seedream Pro (PAID) | `seedream-pro` |
 
 ## 🔒 API Key Security
