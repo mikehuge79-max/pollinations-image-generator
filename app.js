@@ -322,13 +322,29 @@ heightInput.addEventListener('blur', () => clampDimension(heightInput));
 
 // ── Model descriptions ──────────────────────────────────
 const MODEL_INFO = {
-  'flux':          'Default Flux — fast, balanced quality for general use.',
-  'flux-realism':  'Flux Realism — photorealistic images, best for portraits and landscapes.',
-  'flux-3d':       'Flux 3D — renders with a three-dimensional depth effect.',
-  'flux-anime':    'Flux Anime — anime, manga, and illustration style.',
-  'flux-pro':      'Flux Pro — highest quality output, slower generation.',
-  'turbo':         'Turbo — fastest generation, lower detail.',
-  'any-dark':      'Any Dark — cinematic dark aesthetic and moody scenes.',
+  // ── Free models ──────────────────────────────────────
+  'flux':           'Flux Schnell — fast default model, great balanced quality for most use cases.',
+  'zimage':         'Z-Image Turbo — high-speed generation with good detail.',
+  'klein':          'FLUX.2 Klein 4B — compact alpha Flux variant (experimental).',
+  'gptimage':       'GPT Image 1 Mini — OpenAI compact image model. PRO plan required.',
+  'qwen-image':     'Qwen Image Plus — Alibaba\'s image generation model, strong detail.',
+  'gpt-image-2':    'GPT Image 2 — OpenAI\'s second-generation image model. New.',
+  'wan-image':      'Wan 2.7 Image — advanced image synthesis. New model.',
+  'gptimage-large': 'GPT Image 1.5 — OpenAI larger image model with higher detail. PRO plan.',
+  'kontext':        'FLUX.1 Kontext — context-aware Flux, great for complex compositional scenes.',
+  'seedream':       'Seedream — dream-style artistic image generation.',
+  // ── Paid models ──────────────────────────────────────
+  'p-image':        '💳 Pruna p-image (PAID) — lightweight and efficient image generation.',
+  'p-image-edit':   '💳 Pruna p-image-edit (PAID) — supports image editing and inpainting.',
+  'grok-imagine':   '💳 Grok Imagine (PAID) — xAI\'s image generation, vivid and detailed.',
+  'nanobanana':     '💳 NanoBanana (PAID) — nano image model with broad style support.',
+  'nova-canvas':    '💳 Nova Canvas (PAID) — Amazon Nova image model, photorealistic output.',
+  'seedream5':      '💳 Seedream 5.0 Lite (PAID) — lightweight paid dream-style model.',
+  'nanobanana-2':   '💳 NanoBanana 2 (PAID) — improved second-gen paid nano image model.',
+  'grok-imagine-pro':'💳 Grok Imagine Pro (PAID) — xAI pro-tier, highest quality xAI output.',
+  'wan-image-pro':  '💳 Wan 2.7 Image Pro (PAID) — pro-tier synthesis, maximum detail.',
+  'nanobanana-pro': '💳 NanoBanana Pro (PAID) — premium nano model with enhanced quality.',
+  'seedream-pro':   '💳 Seedream Pro (PAID) — premium dream-style, best artistic quality.',
 };
 
 const modelInfo = document.createElement('p');
