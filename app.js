@@ -319,31 +319,145 @@ heightInput.addEventListener('blur', () => clampDimension(heightInput));
 });
 
 // ── Model descriptions ──────────────────────────────────
-const MODEL_INFO = {
-  // ── Free models ──────────────────────────────────────
-  'flux':           'Flux Schnell — fast default model, great balanced quality for most use cases.',
-  'zimage':         'Z-Image Turbo — high-speed generation with good detail.',
-  'klein':          'FLUX.2 Klein 4B — compact alpha Flux variant (experimental).',
-  'gptimage':       'GPT Image 1 Mini — OpenAI compact image model. PRO plan required.',
-  'qwen-image':     'Qwen Image Plus — Alibaba\'s image generation model, strong detail.',
-  'gpt-image-2':    'GPT Image 2 — OpenAI\'s second-generation image model. New.',
-  'wan-image':      'Wan 2.7 Image — advanced image synthesis. New model.',
-  'gptimage-large': 'GPT Image 1.5 — OpenAI larger image model with higher detail. PRO plan.',
-  'kontext':        'FLUX.1 Kontext — context-aware Flux, great for complex compositional scenes.',
-  'seedream':       'Seedream — dream-style artistic image generation.',
-  // ── Paid models ──────────────────────────────────────
-  'p-image':        '💳 Pruna p-image (PAID) — lightweight and efficient image generation.',
-  'p-image-edit':   '💳 Pruna p-image-edit (PAID) — supports image editing and inpainting.',
-  'grok-imagine':   '💳 Grok Imagine (PAID) — xAI\'s image generation, vivid and detailed.',
-  'nanobanana':     '💳 NanoBanana (PAID) — nano image model with broad style support.',
-  'nova-canvas':    '💳 Nova Canvas (PAID) — Amazon Nova image model, photorealistic output.',
-  'seedream5':      '💳 Seedream 5.0 Lite (PAID) — lightweight paid dream-style model.',
-  'nanobanana-2':   '💳 NanoBanana 2 (PAID) — improved second-gen paid nano image model.',
-  'grok-imagine-pro':'💳 Grok Imagine Pro (PAID) — xAI pro-tier, highest quality xAI output.',
-  'wan-image-pro':  '💳 Wan 2.7 Image Pro (PAID) — pro-tier synthesis, maximum detail.',
-  'nanobanana-pro': '💳 NanoBanana Pro (PAID) — premium nano model with enhanced quality.',
-  'seedream-pro':   '💳 Seedream Pro (PAID) — premium dream-style, best artistic quality.',
-};
+// MODEL_INFO and MODEL_MODALITIES populated dynamically from API
+let MODEL_INFO       = {};
+let MODEL_MODALITIES = {};  // { modelName: ["text"] | ["text","image"] }
+
+// ── DOM: image upload ──────────────────────────────────
+const imageUploadSection    = document.getElementById('image-upload-section');
+const imageDropArea         = document.getElementById('image-drop-area');
+const imageFileInput        = document.getElementById('image-file-input');
+const imageUploadPlaceholder= document.getElementById('image-upload-placeholder');
+const imagePreviewWrap      = document.getElementById('image-preview-wrap');
+const sourceImagePreview    = document.getElementById('source-image-preview');
+const removeImageBtn        = document.getElementById('remove-image-btn');
+const modalityTagsEl        = document.createElement('div');
+modalityTagsEl.className    = 'modality-tags';
+let currentSourceFile       = null;
+
+// ── Dynamic model loading ──────────────────────────────
+async function loadModels() {
+  const select = modelSelect;
+  const previousValue = select.value || localStorage.getItem('__pig_model') || 'flux';
+
+  try {
+    const resp = await fetch('https://gen.pollinations.ai/image/models');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const all = await resp.json();
+
+    // Image-output only, exclude video
+    const models = all.filter(m =>
+      Array.isArray(m.output_modalities) &&
+      m.output_modalities.includes('image') &&
+      !m.output_modalities.includes('video')
+    );
+
+    select.innerHTML = '';
+    MODEL_INFO       = {};
+    MODEL_MODALITIES = {};
+
+    const free = models.filter(m => !m.paid_only);
+    const paid = models.filter(m =>  m.paid_only);
+
+    function buildGroup(list, label) {
+      if (!list.length) return;
+      const grp = document.createElement('optgroup');
+      grp.label = label;
+      list.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.name;
+        const desc   = m.description || m.name;
+        const suffix = m.paid_only ? ' (paid only)' : '';
+        opt.textContent         = desc + suffix;
+        MODEL_INFO[m.name]      = m.paid_only ? '💳 ' + desc + ' — paid plan required.' : desc;
+        MODEL_MODALITIES[m.name]= m.input_modalities || ['text'];
+        grp.appendChild(opt);
+      });
+      select.appendChild(grp);
+    }
+
+    buildGroup(free, 'Free Models');
+    buildGroup(paid, 'Paid Models 💳');
+
+    // Restore selection
+    if (select.querySelector(`option[value="${previousValue}"]`)) {
+      select.value = previousValue;
+    } else if (select.querySelector('option[value="flux"]')) {
+      select.value = 'flux';
+    } else if (select.options.length) {
+      select.selectedIndex = 0;
+    }
+
+    updateModelUI();
+
+  } catch (err) {
+    console.warn('Model load failed:', err.message);
+    select.innerHTML = `
+      <optgroup label="Free Models">
+        <option value="flux">Flux Schnell - Fast high-quality image generation</option>
+        <option value="zimage">Z-Image Turbo - Fast 6B Flux with 2x upscaling</option>
+        <option value="klein">FLUX.2 Klein 4B - Fast image generation and editing</option>
+        <option value="gptimage">GPT Image 1 Mini - OpenAI image generation model</option>
+        <option value="qwen-image">Qwen Image Plus - Alibaba text-to-image and editing</option>
+        <option value="wan-image">Wan 2.7 Image - Alibaba text-to-image (up to 2K)</option>
+        <option value="gptimage-large">GPT Image 1.5 - OpenAI advanced image generation</option>
+        <option value="kontext">FLUX.1 Kontext - In-context editing &amp; generation</option>
+      </optgroup>
+      <optgroup label="Paid Models 💳">
+        <option value="p-image">Pruna p-image - Fast text-to-image (paid only)</option>
+        <option value="p-image-edit">Pruna p-image-edit - Image editing (paid only)</option>
+        <option value="grok-imagine">Grok Imagine - xAI image generation (paid only)</option>
+        <option value="nanobanana">NanoBanana - Gemini 2.5 Flash Image (paid only)</option>
+        <option value="nova-canvas">Amazon Nova Canvas - Bedrock Image (paid only)</option>
+        <option value="seedream5">Seedream 5.0 Lite - ByteDance ARK (paid only)</option>
+        <option value="nanobanana-2">NanoBanana 2 - Gemini 3.1 Flash Image (paid only)</option>
+        <option value="grok-imagine-pro">Grok Imagine Pro - xAI pro image (paid only)</option>
+        <option value="wan-image-pro">Wan 2.7 Image Pro - Alibaba 4K thinking (paid only)</option>
+        <option value="nanobanana-pro">NanoBanana Pro - Gemini 3 Pro Image (paid only)</option>
+      </optgroup>`;
+
+    const imgInputModels = ['kontext','klein','gptimage','gptimage-large','qwen-image',
+      'wan-image','wan-image-pro','p-image-edit','nanobanana','nanobanana-2','nanobanana-pro','nova-canvas'];
+    select.querySelectorAll('option').forEach(opt => {
+      MODEL_MODALITIES[opt.value] = imgInputModels.includes(opt.value) ? ['text','image'] : ['text'];
+      MODEL_INFO[opt.value]       = opt.textContent;
+    });
+    if (select.querySelector('option[value="flux"]')) select.value = 'flux';
+    updateModelUI();
+  }
+}
+
+// ── Model UI helpers ───────────────────────────────────
+function updateModelInfo() {
+  if (window._modelInfoEl) window._modelInfoEl.textContent = MODEL_INFO[modelSelect.value] || '';
+}
+
+function updateModalityTags() {
+  modalityTagsEl.innerHTML = '';
+  (MODEL_MODALITIES[modelSelect.value] || ['text']).forEach(mod => {
+    const t = document.createElement('span');
+    t.className   = 'modality-tag';
+    t.textContent = mod === 'text' ? '📝 text input' : '🖼️ image input';
+    modalityTagsEl.appendChild(t);
+  });
+}
+
+function updateImageUploadVisibility() {
+  const supportsImage = (MODEL_MODALITIES[modelSelect.value] || []).includes('image');
+  if (imageUploadSection) imageUploadSection.classList.toggle('hidden', !supportsImage);
+  if (!supportsImage) clearSourceImage();
+}
+
+function updateModelUI() {
+  updateModelInfo();
+  updateModalityTags();
+  updateImageUploadVisibility();
+}
+
+// Load immediately + refresh every 15 minutes
+loadModels();
+setInterval(loadModels, 15 * 60 * 1000);
+
 
 const modelInfo = document.createElement('p');
 modelInfo.style.cssText = 'font-size:.76rem;color:var(--clr-muted);margin-top:.35rem;min-height:1.1em;';
