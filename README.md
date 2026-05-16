@@ -39,10 +39,9 @@ Your key is:
 - Stored **only in your browser's `localStorage`** — never on any server
 - Obfuscated with XOR + base64 so it's not plaintext-readable in DevTools
 - Cleared instantly from the input field after saving
-- Displayed only as a masked preview (e.g. `pk_12••••5678`)
+- Displayed only as a masked preview (e.g. `ab12••••5678`)
 
-Use your **publishable key** (`pk_…`) — it is safe for client-side use.  
-Never paste a secret key (`sk_…`) into any browser app.
+Get your API key at [enter.pollinations.ai](https://enter.pollinations.ai). Keep it private — do not share it publicly.
 
 ## 🖥️ API Used
 
