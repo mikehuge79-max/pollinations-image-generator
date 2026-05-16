@@ -355,3 +355,45 @@ label {
   font-size: .75rem;
   margin-right: .75rem;
 }
+
+/* ── Image Upload Area ── */
+.image-upload-area {
+  border: 2px dashed var(--clr-border);
+  border-radius: var(--radius-sm);
+  padding: .75rem;
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+.image-upload-area:hover,
+.image-upload-area.drag-over { border-color: var(--clr-accent); }
+
+.upload-placeholder {
+  text-align: center;
+  color: var(--clr-muted);
+  font-size: .85rem;
+  padding: .75rem 0;
+}
+.upload-placeholder span:hover { color: var(--clr-accent); }
+
+#source-image-preview {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--clr-border);
+  display: block;
+  max-height: 200px;
+  object-fit: cover;
+}
+.remove-img-btn { margin-top: .4rem; width: 100%; text-align: center; font-size: .78rem; }
+
+/* ── Modality tag chips ── */
+.modality-tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .4rem; }
+.modality-tag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(129,140,248,.12);
+  border: 1px solid rgba(129,140,248,.25);
+  color: var(--clr-accent2);
+  font-size: .7rem;
+  padding: .15rem .45rem;
+  border-radius: 99px;
+}
