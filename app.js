@@ -544,7 +544,7 @@ function updateModalityTags() {
 function updateImageUploadVisibility() {
   const supportsImage = (MODEL_MODALITIES[modelSelect.value] || []).includes('image');
   if (imageUploadSection) imageUploadSection.classList.toggle('hidden', !supportsImage);
-  if (!supportsImage) clearSourceImage();
+  if (!supportsImage && typeof clearSourceImage === 'function') clearSourceImage();
 }
 
 function updateModelUI() {
