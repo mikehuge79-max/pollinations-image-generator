@@ -61,32 +61,19 @@
 
         <div class="form-group">
           <label for="model">AI Model</label>
-                              <select id="model">
-            <optgroup label="Free Models">
-              <option value="flux">Flux Schnell — fast, balanced quality</option>
-              <option value="zimage">Z-Image Turbo — high-speed generation</option>
-              <option value="klein">FLUX.2 Klein 4B — compact Flux variant (Alpha)</option>
-              <option value="gptimage">GPT Image 1 Mini — OpenAI compact image (PRO)</option>
-              <option value="qwen-image">Qwen Image Plus — Alibaba's image model</option>
-              <option value="gpt-image-2">GPT Image 2 — OpenAI image model v2 (New)</option>
-              <option value="wan-image">Wan 2.7 Image — advanced image synthesis (New)</option>
-              <option value="gptimage-large">GPT Image 1.5 — OpenAI larger image (PRO)</option>
-              <option value="kontext">FLUX.1 Kontext — context-aware Flux</option>
-              <option value="seedream">Seedream — dream-style generation</option>
-            </optgroup>
-            <optgroup label="Paid Models 💳">
-              <option value="p-image">Pruna p-image (PAID) — lightweight image gen</option>
-              <option value="p-image-edit">Pruna p-image-edit (PAID) — image editing</option>
-              <option value="grok-imagine">Grok Imagine (PAID) — xAI image generation</option>
-              <option value="nanobanana">NanoBanana (PAID) — nano image model</option>
-              <option value="nova-canvas">Nova Canvas (PAID) — Amazon Nova image</option>
-              <option value="seedream5">Seedream 5.0 Lite (PAID) — dream model</option>
-              <option value="nanobanana-2">NanoBanana 2 (PAID) — improved nano model</option>
-              <option value="grok-imagine-pro">Grok Imagine Pro (PAID) — xAI pro quality</option>
-              <option value="wan-image-pro">Wan 2.7 Image Pro (PAID) — pro synthesis</option>
-              <option value="nanobanana-pro">NanoBanana Pro (PAID) — premium nano model</option>
-              <option value="seedream-pro">Seedream Pro (PAID) — premium dream model</option>
-            </optgroup>
+                                        <!-- Custom scrollable model dropdown -->
+          <div class="custom-select-wrapper" id="model-dropdown-wrapper">
+            <button type="button" class="custom-select-trigger" id="model-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span id="model-trigger-text">Loading models…</span>
+              <span class="select-arrow">▾</span>
+            </button>
+            <div class="custom-select-dropdown" id="model-dropdown" role="listbox" aria-label="Select model">
+              <!-- Options injected by JS -->
+            </div>
+          </div>
+          <!-- Hidden native select keeps value accessible via modelSelect -->
+          <select id="model" style="display:none" aria-hidden="true">
+            <option value="" disabled selected>Loading…</option>
           </select>
         </div>
 
