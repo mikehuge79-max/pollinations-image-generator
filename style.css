@@ -54,6 +54,11 @@ input, select, textarea {
   transition: border-color var(--transition);
   outline: none;
 }
+
+/* Native select: allow scroll on all devices */
+select {
+  max-height: 60vh;
+}
 input:focus, select:focus, textarea:focus {
   border-color: var(--clr-accent);
 }
@@ -234,7 +239,19 @@ label {
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .app-body { grid-template-columns: 1fr; }
-  .controls-panel { max-height: none; position: static; border-right: none; border-bottom: 1px solid var(--clr-border); }
+  .controls-panel {
+    max-height: none;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--clr-border);
+    overflow-y: visible;
+  }
+  /* Model select: scrollable on mobile */
+  select#model, select {
+    max-height: 180px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* ── Controls ── */
