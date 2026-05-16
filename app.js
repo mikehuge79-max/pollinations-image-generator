@@ -472,5 +472,8 @@ modelSelect.parentElement.appendChild(modelInfo);
 function updateModelInfo() {
   modelInfo.textContent = MODEL_INFO[modelSelect.value] || '';
 }
-modelSelect.addEventListener('change', updateModelInfo);
+modelSelect.addEventListener('change', () => {
+  localStorage.setItem('__pig_model', modelSelect.value);
+  updateModelUI();
+});
 updateModelInfo();
