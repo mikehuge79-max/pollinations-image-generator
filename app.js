@@ -486,6 +486,7 @@ async function loadModels() {
     }
 
     updateModelUI();
+    rebuildCustomDropdown();
 
   } catch (err) {
     console.warn('Model load failed:', err.message);
@@ -521,6 +522,7 @@ async function loadModels() {
     });
     if (select.querySelector('option[value="flux"]')) select.value = 'flux';
     updateModelUI();
+    rebuildCustomDropdown();
   }
 }
 
