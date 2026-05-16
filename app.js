@@ -109,7 +109,7 @@ const modelSelect   = document.getElementById('model');
 const widthInput    = document.getElementById('width');
 const heightInput   = document.getElementById('height');
 const seedInput     = document.getElementById('seed');
-// enhance removed — not supported by current API
+const enhanceChk = document.getElementById('enhance');
 const nologoChk     = document.getElementById('nologo');
 const randomizeBtn  = document.getElementById('randomize-seed');
 const generateBtn   = document.getElementById('generate-btn');
