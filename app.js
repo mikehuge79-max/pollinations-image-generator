@@ -109,7 +109,7 @@ const modelSelect   = document.getElementById('model');
 const widthInput    = document.getElementById('width');
 const heightInput   = document.getElementById('height');
 const seedInput     = document.getElementById('seed');
-const enhanceChk    = document.getElementById('enhance');
+// enhance removed — not supported by current API
 const nologoChk     = document.getElementById('nologo');
 const randomizeBtn  = document.getElementById('randomize-seed');
 const generateBtn   = document.getElementById('generate-btn');
@@ -176,7 +176,7 @@ function showError(msg) {
 
 // ── Build image URL ─────────────────────────────────────
 function buildImageUrl(params) {
-  const { prompt, model, width, height, seed, enhance, nologo, apiKey } = params;
+  const { prompt, model, width, height, seed, nologo, apiKey } = params;
   const encoded = encodeURIComponent(prompt.trim());
   const base    = `https://image.pollinations.ai/prompt/${encoded}`;
 
@@ -185,7 +185,6 @@ function buildImageUrl(params) {
     width:   Math.max(64, Math.min(2048, parseInt(width)  || 1024)),
     height:  Math.max(64, Math.min(2048, parseInt(height) || 1024)),
     nologo:  nologo  ? 'true' : 'false',
-    enhance: enhance ? 'true' : 'false',
     key:     apiKey,
   });
 
@@ -217,7 +216,6 @@ async function generateImage() {
     width:   widthInput.value,
     height:  heightInput.value,
     seed:    seedInput.value,
-    enhance: enhanceChk.checked,
     nologo:  nologoChk.checked,
     apiKey,
   };
@@ -294,8 +292,8 @@ promptInput.parentElement.querySelector('label').appendChild(charCounter);
 
 function updateCharCount() {
   const len = promptInput.value.length;
-  charCounter.textContent = `${len} / 500`;
-  charCounter.style.color = len > 450 ? 'var(--clr-error)' : 'var(--clr-muted)';
+  charCounter.textContent = `${len} / 1500`;
+  charCounter.style.color = len > 1350 ? 'var(--clr-error)' : 'var(--clr-muted)';
 }
 promptInput.addEventListener('input', updateCharCount);
 updateCharCount();
