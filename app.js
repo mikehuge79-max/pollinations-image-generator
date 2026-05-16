@@ -351,11 +351,14 @@ modelTrigger.addEventListener('click', e => {
 });
 
 // Close on outside click / scroll
-document.addEventListener('click', () => closeModelDropdown());
-document.addEventListener('scroll', () => closeModelDropdown(), true);
+document.addEventListener('mousedown', e => {
+  const wrapper = document.getElementById('model-dropdown-wrapper');
+  if (wrapper && !wrapper.contains(e.target)) closeModelDropdown();
+});
 
 // Prevent dropdown scroll from closing it
-modelDropdown.addEventListener('click', e => e.stopPropagation());
+modelDropdown.addEventListener('mousedown', e => e.stopPropagation());
+modelDropdown.addEventListener('click',     e => e.stopPropagation());
 
 /**
  * Rebuild the custom dropdown from the hidden <select> options.
