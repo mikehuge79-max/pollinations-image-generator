@@ -7,11 +7,13 @@ A polished, browser-based UI for generating AI images with the [Pollinations.ai]
 | Feature | Details |
 |---------|---------|
 | 🔑 Secure key storage | XOR-obfuscated, base64-encoded in `localStorage` |
-| 🖼️ 21 AI models | 10 free + 11 paid — full current Pollinations.ai list |
+| 🖼️ Dynamic models | Fetched live every 15 min from gen.pollinations.ai/image/models |
 | 📐 Ratio presets | 1:1 · 16:9 · 9:16 · 4:3 · 3:4 · Custom |
 | 🎲 Seed control | Reproducible images or random |
 | ✨ Prompt enhance | AI-improved prompts via Pollinations |
+| 🖼️→🖼️ Image input | Upload source image for models with image input modality |
 | ⬇️ Download | One-click PNG download with CORS fallback |
+| 📝 Long prompts | Up to 1500 characters |
 | ⌨️ Keyboard | `Ctrl / ⌘ + Enter` to generate |
 
 ## 🚀 Getting Started
@@ -21,38 +23,15 @@ A polished, browser-based UI for generating AI images with the [Pollinations.ai]
 3. **Paste** your publishable key (`pk_…`) into the setup screen
 4. **Generate** — craft a prompt, pick a model, hit ✨ Generate
 
-## 🖼️ Available Models
+## 🖼️ Models
 
-### Free Models
+The model list loads **live** from the Pollinations API and refreshes automatically every 15 minutes:
 
-| Display Name | API Value | Notes |
-|---|---|---|
-| Flux Schnell | `flux` | Default — fast & balanced |
-| Z-Image Turbo | `zimage` | High-speed generation |
-| FLUX.2 Klein 4B | `klein` | Alpha variant |
-| GPT Image 1 Mini | `gptimage` | OpenAI — PRO plan |
-| Qwen Image Plus | `qwen-image` | Alibaba model |
-| GPT Image 2 | `gpt-image-2` | OpenAI v2 — new |
-| Wan 2.7 Image | `wan-image` | New model |
-| GPT Image 1.5 | `gptimage-large` | OpenAI — PRO plan |
-| FLUX.1 Kontext | `kontext` | Context-aware Flux |
-| Seedream | `seedream` | Dream-style artistic |
+```
+GET https://gen.pollinations.ai/image/models
+```
 
-### Paid Models 💳
-
-| Display Name | API Value |
-|---|---|
-| Pruna p-image (PAID) | `p-image` |
-| Pruna p-image-edit (PAID) | `p-image-edit` |
-| Grok Imagine (PAID) | `grok-imagine` |
-| NanoBanana (PAID) | `nanobanana` |
-| Nova Canvas (PAID) | `nova-canvas` |
-| Seedream 5.0 Lite (PAID) | `seedream5` |
-| NanoBanana 2 (PAID) | `nanobanana-2` |
-| Grok Imagine Pro (PAID) | `grok-imagine-pro` |
-| Wan 2.7 Image Pro (PAID) | `wan-image-pro` |
-| NanoBanana Pro (PAID) | `nanobanana-pro` |
-| Seedream Pro (PAID) | `seedream-pro` |
+Models are grouped into **Free** and **Paid (paid only)** based on the `paid_only` field in the API response. The UI always reflects the current state — no manual updates needed.
 
 ## 🔒 API Key Security
 
