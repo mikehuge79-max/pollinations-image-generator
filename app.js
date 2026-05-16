@@ -195,50 +195,56 @@ function buildImageUrl(params) {
   return `${base}?${qs.toString()}`;
 }
 
-// ── Generate image ──────────────────────────────────────
+// ── Generate image ────────────────────────────────────────
 async function generateImage() {
   const prompt = promptInput.value.trim();
-  if (!prompt) {
-    showError('Please enter a prompt before generating.');
-    return;
-  }
+  if (!prompt) { showError('Please enter a prompt before generating.'); return; }
 
   const apiKey = loadApiKey();
-  if (!apiKey) {
-    clearApiKey();
-    showSetupScreen();
-    return;
-  }
+  if (!apiKey) { clearApiKey(); showSetupScreen(); return; }
 
-  const params = {
-    prompt,
-    model:   modelSelect.value,
-    width:   widthInput.value,
-    height:  heightInput.value,
-    seed:    seedInput.value,
-    nologo:  nologoChk.checked,
-    apiKey,
-  };
+  const model  = modelSelect.value;
+  const width  = Math.max(64, Math.min(2048, parseInt(widthInput.value)  || 1024));
+  const height = Math.max(64, Math.min(2048, parseInt(heightInput.value) || 1024));
+  const seed   = seedInput.value?.toString().trim() || '';
+  const nologo = nologoChk.checked;
 
   setLoading(true);
   showOutput('loading');
 
   try {
-    const url = buildImageUrl(params);
+    let imageUrl;
 
-    // Load the image through an Image element so we get proper error events
+    if (currentSourceFile) {
+      // POST with FormData for models that accept image input
+      const encoded  = encodeURIComponent(prompt);
+      const endpoint = `https://gen.pollinations.ai/image/${encoded}`;
+      const qs = new URLSearchParams({ model, width, height, key: apiKey, nologo: String(nologo) });
+      if (seed) qs.set('seed', seed);
+
+      const form = new FormData();
+      form.append('image', currentSourceFile, currentSourceFile.name);
+
+      const resp = await fetch(`${endpoint}?${qs}`, { method: 'POST', body: form });
+      if (!resp.ok) {
+        const txt = await resp.text().catch(() => resp.statusText);
+        throw new Error(`API error ${resp.status}: ${txt.slice(0, 150)}`);
+      }
+      const blob = await resp.blob();
+      imageUrl = URL.createObjectURL(blob);
+
+    } else {
+      // GET for text-only generation
+      imageUrl = buildImageUrl({ prompt, model, width, height, seed, nologo, apiKey });
+    }
+
     await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        generatedImg.src = url;
-        resolve();
-      };
-      img.onerror = () => reject(new Error('Image generation failed. Check your API key or try a different prompt.'));
-      img.src = url;
+      const img  = new Image();
+      img.onload = () => { generatedImg.src = imageUrl; currentImageUrl = imageUrl; resolve(); };
+      img.onerror= () => reject(new Error('Image generation failed. Check your API key or try a different prompt.'));
+      img.src    = imageUrl;
     });
 
-    // Store URL for download
-    generateBtn.dataset.lastUrl = url;
     showOutput('image');
   } catch (err) {
     showError(err.message);
