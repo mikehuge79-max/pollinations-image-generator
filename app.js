@@ -477,6 +477,8 @@ setInterval(loadModels, 15 * 60 * 1000);
 const modelInfo = document.createElement('p');
 modelInfo.style.cssText = 'font-size:.76rem;color:var(--clr-muted);margin-top:.35rem;min-height:1.1em;';
 modelSelect.parentElement.appendChild(modelInfo);
+modelSelect.parentElement.appendChild(modalityTagsEl);
+window._modelInfoEl = modelInfo;
 
 function updateModelInfo() {
   modelInfo.textContent = MODEL_INFO[modelSelect.value] || '';
