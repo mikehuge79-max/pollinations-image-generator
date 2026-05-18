@@ -326,98 +326,13 @@ heightInput.addEventListener('blur', () => clampDimension(heightInput));
 
 // ── Model descriptions ──────────────────────────────────
 
-// ── Custom model dropdown ───────────────────────────────
-const modelTrigger   = document.getElementById('model-trigger');
-const modelTriggerText = document.getElementById('model-trigger-text');
-const modelDropdown  = document.getElementById('model-dropdown');
-
-function openModelDropdown() {
-  modelDropdown.classList.add('open');
-  modelTrigger.setAttribute('aria-expanded', 'true');
-}
-
-function closeModelDropdown() {
-  modelDropdown.classList.remove('open');
-  modelTrigger.setAttribute('aria-expanded', 'false');
-}
-
-function toggleModelDropdown() {
-  modelDropdown.classList.contains('open') ? closeModelDropdown() : openModelDropdown();
-}
-
-modelTrigger.addEventListener('click', e => {
-  e.stopPropagation();
-  toggleModelDropdown();
-});
-
-// Close on outside click / scroll
-document.addEventListener('mousedown', e => {
-  const wrapper = document.getElementById('model-dropdown-wrapper');
-  if (wrapper && !wrapper.contains(e.target)) closeModelDropdown();
-});
-
-// Prevent dropdown scroll from closing it
-modelDropdown.addEventListener('mousedown', e => e.stopPropagation());
-modelDropdown.addEventListener('click',     e => e.stopPropagation());
-
 /**
  * Rebuild the custom dropdown from the hidden <select> options.
  * Called after loadModels() populates the native select.
  */
-function rebuildCustomDropdown() {
-  modelDropdown.innerHTML = '';
 
-  // Walk optgroups and options from hidden select
-  Array.from(modelSelect.children).forEach(child => {
-    if (child.tagName === 'OPTGROUP') {
-      const groupLabel = document.createElement('div');
-      groupLabel.className   = 'custom-select-group-label';
-      groupLabel.textContent = child.label;
-      modelDropdown.appendChild(groupLabel);
 
-      Array.from(child.children).forEach(opt => addOption(opt));
-    } else if (child.tagName === 'OPTION' && child.value) {
-      addOption(child);
-    }
-  });
 
-  // Sync trigger text with current value
-  syncTriggerText();
-}
-
-function addOption(opt) {
-  const div = document.createElement('div');
-  div.className    = 'custom-select-option';
-  div.dataset.value= opt.value;
-  div.textContent  = opt.textContent;
-  div.setAttribute('role', 'option');
-  if (opt.value === modelSelect.value) div.classList.add('selected');
-
-  div.addEventListener('click', () => {
-    // Update hidden select
-    modelSelect.value = opt.value;
-    // Sync UI
-    syncTriggerText();
-    markSelected(opt.value);
-    closeModelDropdown();
-    // Trigger model change logic
-    localStorage.setItem('__pig_model', opt.value);
-    updateModelUI();
-  });
-
-  modelDropdown.appendChild(div);
-}
-
-function syncTriggerText() {
-  const selected = modelSelect.options[modelSelect.selectedIndex];
-  modelTriggerText.textContent = selected ? selected.textContent : 'Select a model…';
-}
-
-function markSelected(value) {
-  modelDropdown.querySelectorAll('.custom-select-option').forEach(el => {
-    el.classList.toggle('selected', el.dataset.value === value);
-  });
-}
 
 // MODEL_INFO and MODEL_MODALITIES populated dynamically from API
 let MODEL_INFO       = {};
@@ -489,7 +404,6 @@ async function loadModels() {
     }
 
     updateModelUI();
-    rebuildCustomDropdown();
 
   } catch (err) {
     console.warn('Model load failed:', err.message);
@@ -525,7 +439,6 @@ async function loadModels() {
     });
     if (select.querySelector('option[value="flux"]')) select.value = 'flux';
     updateModelUI();
-    rebuildCustomDropdown();
   }
 }
 
