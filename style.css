@@ -233,17 +233,7 @@ label {
 }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
-  .app-body { grid-template-columns: 1fr; }
-  .controls-panel {
-    max-height: none;
-    position: static;
-    border-right: none;
-    border-bottom: 1px solid var(--clr-border);
-    overflow-y: visible;
-  }
-  /* Model select: scrollable on mobile */
-  }
+
 
 /* ── Controls ── */
 .ratio-grid {
@@ -406,3 +396,36 @@ label {
   border-radius: 99px;
 }
 
+/* ── Mobile layout ── */
+@media (max-width: 768px) {
+  /* Stack panels vertically, full natural height */
+  .app-body {
+    display: block;
+  }
+
+  /* Controls panel: no sticky, no fixed height, no overflow clip */
+  .controls-panel {
+    position: static;
+    max-height: none;
+    height: auto;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--clr-border);
+    padding: 1rem;
+  }
+
+  /* Output panel full width */
+  .output-panel {
+    padding: 1rem;
+    min-height: 300px;
+  }
+
+  /* Header: smaller text */
+  .app-header .logo span { font-size: .9rem; }
+
+  /* Ratio grid: 3 columns fit fine */
+  .ratio-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Image actions stack */
+  .image-actions { flex-direction: column; }
+}
