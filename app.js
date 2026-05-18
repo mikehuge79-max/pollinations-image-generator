@@ -178,7 +178,7 @@ function showError(msg) {
 function buildImageUrl(params) {
   const { prompt, model, width, height, seed, nologo, enhance, apiKey } = params;
   const encoded = encodeURIComponent(prompt.trim());
-  const base    = `https://image.pollinations.ai/prompt/${encoded}`;
+  const base    = `https://gen.pollinations.ai/image/${encoded}`;
 
   const qs = new URLSearchParams({
     model,

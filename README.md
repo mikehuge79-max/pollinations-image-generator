@@ -46,7 +46,7 @@ Get your API key at [enter.pollinations.ai](https://enter.pollinations.ai). Keep
 ## 🖥️ API Used
 
 ```
-GET https://image.pollinations.ai/prompt/{encoded_prompt}
+GET https://gen.pollinations.ai/image/{encoded_prompt}
     ?model=flux
     &width=1024
     &height=1024
