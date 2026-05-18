@@ -28,7 +28,7 @@ A polished, browser-based UI for generating AI images with the [Pollinations.ai]
 The model list loads **live** from the Pollinations API and refreshes automatically every 15 minutes:
 
 ```
-GET https://gen.pollinations.ai/image/models
+GET https://image.pollinations.ai/prompt/models
 ```
 
 Models are grouped into **Free** and **Paid (paid only)** based on the `paid_only` field in the API response. The UI always reflects the current state — no manual updates needed.
@@ -46,7 +46,7 @@ Get your API key at [enter.pollinations.ai](https://enter.pollinations.ai). Keep
 ## 🖥️ API Used
 
 ```
-GET https://gen.pollinations.ai/image/{encoded_prompt}
+GET https://image.pollinations.ai/prompt/{encoded_prompt}
     ?model=flux
     &width=1024
     &height=1024

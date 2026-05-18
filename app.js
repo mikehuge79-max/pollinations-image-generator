@@ -178,7 +178,7 @@ function showError(msg) {
 function buildImageUrl(params) {
   const { prompt, model, width, height, seed, nologo, enhance, apiKey } = params;
   const encoded = encodeURIComponent(prompt.trim());
-  const base    = `https://gen.pollinations.ai/image/${encoded}`;
+  const base    = `https://image.pollinations.ai/prompt/${encoded}`;
 
   const qs = new URLSearchParams({
     model,
@@ -415,7 +415,7 @@ async function loadModels() {
   const previousValue = select.value || localStorage.getItem('__pig_model') || 'flux';
 
   try {
-    const resp = await fetch('https://gen.pollinations.ai/image/models');
+    const resp = await fetch('https://image.pollinations.ai/prompt/models');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const all = await resp.json();
 
