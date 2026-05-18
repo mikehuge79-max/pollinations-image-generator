@@ -235,9 +235,7 @@ if (_removeBtn) {
     e.stopPropagation();
     clearSourceImage();
   });
-}
-;
-}
+};
 
 // Drag & drop on the label/area
 const _dropArea = document.getElementById('image-drop-area');
