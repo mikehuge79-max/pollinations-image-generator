@@ -236,7 +236,7 @@ if (_removeBtn) {
     clearSourceImage();
   });
 }
-);
+;
 }
 
 // Drag & drop on the label/area
