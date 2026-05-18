@@ -61,19 +61,8 @@
 
         <div class="form-group">
           <label for="model">AI Model</label>
-                                        <!-- Custom scrollable model dropdown -->
-          <div class="custom-select-wrapper" id="model-dropdown-wrapper">
-            <button type="button" class="custom-select-trigger" id="model-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span id="model-trigger-text">Loading models…</span>
-              <span class="select-arrow">▾</span>
-            </button>
-            <div class="custom-select-dropdown" id="model-dropdown" role="listbox" aria-label="Select model">
-              <!-- Options injected by JS -->
-            </div>
-          </div>
-          <!-- Hidden native select keeps value accessible via modelSelect -->
-          <select id="model" style="display:none" aria-hidden="true">
-            <option value="" disabled selected>Loading…</option>
+                                        <select id="model">
+            <option value="" disabled selected>Loading models…</option>
           </select>
         </div>
 
