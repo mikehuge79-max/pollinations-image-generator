@@ -176,7 +176,7 @@ function showError(msg) {
 
 // ── Build image URL ─────────────────────────────────────
 function buildImageUrl(params) {
-  const { prompt, model, width, height, seed, nologo, apiKey } = params;
+  const { prompt, model, width, height, seed, nologo, enhance, apiKey } = params;
   const encoded = encodeURIComponent(prompt.trim());
   const base    = `https://image.pollinations.ai/prompt/${encoded}`;
 
@@ -257,6 +257,58 @@ if (_dropArea) {
     const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
     if (file) applySourceFile(file);
   });
+}
+
+
+
+// ── Generate image ───────────────────────────────────────
+async function generateImage() {
+  const prompt = promptInput.value.trim();
+  const apiKey = loadApiKey();
+
+  if (!prompt) {
+    showError('Please enter a prompt first.');
+    promptInput.focus();
+    return;
+  }
+
+  if (!apiKey) {
+    showSetupScreen();
+    return;
+  }
+
+  setLoading(true);
+  showOutput('loading');
+
+  try {
+    let imageUrl = buildImageUrl({
+      prompt,
+      model: modelSelect.value,
+      width: widthInput.value,
+      height: heightInput.value,
+      seed: seedInput.value,
+      nologo: nologoChk.checked,
+      enhance: enhanceChk.checked,
+      apiKey
+    });
+
+    imageUrl += (imageUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+
+    await new Promise((resolve, reject) => {
+      const testImg = new Image();
+      testImg.onload = resolve;
+      testImg.onerror = () => reject(new Error('Image generation failed. Check API key, prompt, model, or network.'));
+      testImg.src = imageUrl;
+    });
+
+    generatedImg.src = imageUrl;
+    showOutput('image');
+  } catch (err) {
+    console.error(err);
+    showError(err.message || 'Image generation failed.');
+  } finally {
+    setLoading(false);
+  }
 }
 
 
