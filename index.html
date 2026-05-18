@@ -104,16 +104,15 @@
         
         <div id="image-upload-section" class="form-group hidden">
           <label>Source Image <span class="hint">(this model supports image input)</span></label>
-          <div class="image-upload-area" id="image-drop-area">
-            <input type="file" id="image-file-input" accept="image/*" style="display:none" />
+          <label class="image-upload-area" id="image-drop-area" for="image-file-input">
             <div id="image-upload-placeholder" class="upload-placeholder">
               <span>📎 Click or drag &amp; drop an image</span>
             </div>
             <div id="image-preview-wrap" class="hidden">
               <img id="source-image-preview" src="" alt="Source image preview" />
-              <button type="button" id="remove-image-btn" class="btn-ghost remove-img-btn">✕ Remove</button>
+              <button type="button" id="remove-image-btn" class="btn-ghost remove-img-btn" onclick="event.preventDefault()">✕ Remove</button>
             </div>
-          </div>
+          </label>
         </div>
 
 <div class="toggle-group form-group">
