@@ -175,24 +175,46 @@ function showError(msg) {
 }
 
 // ── Build image URL ─────────────────────────────────────
+function getSelectedModelName(preferredModel) {
+  const selectedOption = modelSelect && modelSelect.options
+    ? modelSelect.options[modelSelect.selectedIndex]
+    : null;
+
+  const model =
+    preferredModel ||
+    (selectedOption && selectedOption.value) ||
+    (modelSelect && modelSelect.value) ||
+    localStorage.getItem('__pig_model') ||
+    'flux';
+
+  return String(model).trim() || 'flux';
+}
+
+
 function buildImageUrl(params) {
-  const { prompt, model, width, height, seed, nologo, enhance, apiKey } = params;
+  const { prompt, width, height, seed, nologo, enhance, apiKey } = params;
+  const model = getSelectedModelName(params.model);
   const encoded = encodeURIComponent(prompt.trim());
-  const base = `https://image.pollinations.ai/prompt/${encoded}`;
+  const base = `https://gen.pollinations.ai/image/${encoded}`;
 
   const qs = new URLSearchParams({
     model,
-    width:   Math.max(64, Math.min(2048, parseInt(width)  || 1024)),
-    height:  Math.max(64, Math.min(2048, parseInt(height) || 1024)),
-    nologo:  nologo  ? 'true' : 'false',
-    key:     apiKey,
+    width: String(Math.max(64, Math.min(2048, parseInt(width) || 1024))),
+    height: String(Math.max(64, Math.min(2048, parseInt(height) || 1024))),
+    nologo: nologo ? 'true' : 'false',
+    enhance: enhance ? 'true' : 'false',
+    key: apiKey
   });
 
   if (seed && seed.toString().trim() !== '') {
-    qs.set('seed', parseInt(seed));
+    qs.set('seed', String(parseInt(seed)));
   }
 
-  return `${base}?${qs.toString()}`;
+  const url = `${base}?${qs.toString()}`;
+  console.info('[Pollinations] Image request model:', model);
+  console.info('[Pollinations] Image request URL:', url);
+
+  return url;
 }
 
 // ── Image upload handlers ───────────────────────────────
@@ -283,7 +305,7 @@ async function generateImage() {
   try {
     let imageUrl = buildImageUrl({
       prompt,
-      model: modelSelect.value,
+      model: getSelectedModelName(),
       width: widthInput.value,
       height: heightInput.value,
       seed: seedInput.value,
@@ -393,133 +415,89 @@ heightInput.addEventListener('blur', () => clampDimension(heightInput));
 
 
 
-// MODEL_INFO and MODEL_MODALITIES populated dynamically from API
-let MODEL_INFO       = {};
-let MODEL_MODALITIES = {};  // { modelName: ["text"] | ["text","image"] }
+// MODEL_INFO and MODEL_MODALITIES are populated from the Pollinations models API.
+let MODEL_INFO = {};
+let MODEL_MODALITIES = {};
+let CURRENT_MODEL = localStorage.getItem('__pig_model') || 'flux';
 
-// ── DOM: image upload ──────────────────────────────────
-const imageUploadSection    = document.getElementById('image-upload-section');
-const imageDropArea         = document.getElementById('image-drop-area');
-const imageFileInput        = document.getElementById('image-file-input');
-const imageUploadPlaceholder= document.getElementById('image-upload-placeholder');
-const imagePreviewWrap      = document.getElementById('image-preview-wrap');
-const sourceImagePreview    = document.getElementById('source-image-preview');
-const removeImageBtn        = document.getElementById('remove-image-btn');
-const modalityTagsEl        = document.createElement('div');
-modalityTagsEl.className    = 'modality-tags';
-let currentSourceFile       = null;
+// DOM: image upload.
+const imageUploadSection = document.getElementById('image-upload-section');
+const imageDropArea = document.getElementById('image-drop-area');
+const imageFileInput = document.getElementById('image-file-input');
+const imageUploadPlaceholder = document.getElementById('image-upload-placeholder');
+const imagePreviewWrap = document.getElementById('image-preview-wrap');
+const sourceImagePreview = document.getElementById('source-image-preview');
+const removeImageBtn = document.getElementById('remove-image-btn');
 
-// ── Dynamic model loading ──────────────────────────────
-async function loadModels() {
-  const select = modelSelect;
-  const previousValue = select.value || localStorage.getItem('__pig_model') || 'flux';
+const modalityTagsEl = document.createElement('div');
+modalityTagsEl.className = 'modality-tags';
 
-  try {
-    const resp = await fetch('https://gen.pollinations.ai/image/models');
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const all = await resp.json();
+let currentSourceFile = null;
 
-    // Image-output only, exclude video
-    const models = all.filter(m =>
-      Array.isArray(m.output_modalities) &&
-      m.output_modalities.includes('image') &&
-      !m.output_modalities.includes('video')
-    );
+const modelInfo = document.createElement('p');
+modelInfo.style.cssText = 'font-size:.76rem;color:var(--clr-muted);margin-top:.35rem;min-height:1.1em;';
+modelSelect.parentElement.appendChild(modelInfo);
+modelSelect.parentElement.appendChild(modalityTagsEl);
 
-    select.innerHTML = '';
-    MODEL_INFO       = {};
-    MODEL_MODALITIES = {};
-
-    const free = models.filter(m => !m.paid_only);
-    const paid = models.filter(m =>  m.paid_only);
-
-    function buildGroup(list, label) {
-      if (!list.length) return;
-      const grp = document.createElement('optgroup');
-      grp.label = label;
-      list.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m.name;
-        const desc   = m.description || m.name;
-        const suffix = m.paid_only ? ' (paid only)' : '';
-        opt.textContent         = desc + suffix;
-        MODEL_INFO[m.name]      = m.paid_only ? '💳 ' + desc + ' — paid plan required.' : desc;
-        MODEL_MODALITIES[m.name]= m.input_modalities || ['text'];
-        grp.appendChild(opt);
-      });
-      select.appendChild(grp);
-    }
-
-    buildGroup(free, 'Free Models');
-    buildGroup(paid, 'Paid Models 💳');
-
-    // Restore selection
-    if (select.querySelector(`option[value="${previousValue}"]`)) {
-      select.value = previousValue;
-    } else if (select.querySelector('option[value="flux"]')) {
-      select.value = 'flux';
-    } else if (select.options.length) {
-      select.selectedIndex = 0;
-    }
-
-    updateModelUI();
-
-  } catch (err) {
-    console.warn('Model load failed:', err.message);
-    select.innerHTML = `
-      <optgroup label="Free Models">
-        <option value="flux">Flux Schnell - Fast high-quality image generation</option>
-        <option value="zimage">Z-Image Turbo - Fast 6B Flux with 2x upscaling</option>
-        <option value="klein">FLUX.2 Klein 4B - Fast image generation and editing</option>
-        <option value="gptimage">GPT Image 1 Mini - OpenAI image generation model</option>
-        <option value="qwen-image">Qwen Image Plus - Alibaba text-to-image and editing</option>
-        <option value="wan-image">Wan 2.7 Image - Alibaba text-to-image (up to 2K)</option>
-        <option value="gptimage-large">GPT Image 1.5 - OpenAI advanced image generation</option>
-        <option value="kontext">FLUX.1 Kontext - In-context editing &amp; generation</option>
-      </optgroup>
-      <optgroup label="Paid Models 💳">
-        <option value="p-image">Pruna p-image - Fast text-to-image (paid only)</option>
-        <option value="p-image-edit">Pruna p-image-edit - Image editing (paid only)</option>
-        <option value="grok-imagine">Grok Imagine - xAI image generation (paid only)</option>
-        <option value="nanobanana">NanoBanana - Gemini 2.5 Flash Image (paid only)</option>
-        <option value="nova-canvas">Amazon Nova Canvas - Bedrock Image (paid only)</option>
-        <option value="seedream5">Seedream 5.0 Lite - ByteDance ARK (paid only)</option>
-        <option value="nanobanana-2">NanoBanana 2 - Gemini 3.1 Flash Image (paid only)</option>
-        <option value="grok-imagine-pro">Grok Imagine Pro - xAI pro image (paid only)</option>
-        <option value="wan-image-pro">Wan 2.7 Image Pro - Alibaba 4K thinking (paid only)</option>
-        <option value="nanobanana-pro">NanoBanana Pro - Gemini 3 Pro Image (paid only)</option>
-      </optgroup>`;
-
-    const imgInputModels = ['kontext','klein','gptimage','gptimage-large','qwen-image',
-      'wan-image','wan-image-pro','p-image-edit','nanobanana','nanobanana-2','nanobanana-pro','nova-canvas'];
-    select.querySelectorAll('option').forEach(opt => {
-      MODEL_MODALITIES[opt.value] = imgInputModels.includes(opt.value) ? ['text','image'] : ['text'];
-      MODEL_INFO[opt.value]       = opt.textContent;
-    });
-    if (select.querySelector('option[value="flux"]')) select.value = 'flux';
-    updateModelUI();
-  }
+function getModelLabel(model) {
+  return model.description || model.label || model.name || model.id || 'Unknown model';
 }
 
-// ── Model UI helpers ───────────────────────────────────
+function getModelName(model) {
+  return model.name || model.id || model.model || '';
+}
+
+function setSelectedModelName(modelName, persist = true) {
+  const normalized = String(modelName || '').trim();
+  const fallback = modelSelect.querySelector('option[value="flux"]')
+    ? 'flux'
+    : (modelSelect.options[0] ? modelSelect.options[0].value : 'flux');
+
+  CURRENT_MODEL = normalized || fallback;
+
+  if (modelSelect.querySelector(`option[value="${CSS.escape(CURRENT_MODEL)}"]`)) {
+    modelSelect.value = CURRENT_MODEL;
+  } else {
+    CURRENT_MODEL = fallback;
+    modelSelect.value = fallback;
+  }
+
+  if (persist) {
+    localStorage.setItem('__pig_model', CURRENT_MODEL);
+  }
+
+  updateModelUI();
+  console.info('[Pollinations] Selected model:', CURRENT_MODEL);
+}
+
 function updateModelInfo() {
-  if (window._modelInfoEl) window._modelInfoEl.textContent = MODEL_INFO[modelSelect.value] || '';
+  modelInfo.textContent = MODEL_INFO[CURRENT_MODEL] || MODEL_INFO[modelSelect.value] || '';
 }
 
 function updateModalityTags() {
   modalityTagsEl.innerHTML = '';
-  (MODEL_MODALITIES[modelSelect.value] || ['text']).forEach(mod => {
-    const t = document.createElement('span');
-    t.className   = 'modality-tag';
-    t.textContent = mod === 'text' ? '📝 text input' : '🖼️ image input';
-    modalityTagsEl.appendChild(t);
+
+  const modalities = MODEL_MODALITIES[CURRENT_MODEL] || MODEL_MODALITIES[modelSelect.value] || ['text'];
+
+  modalities.forEach((modality) => {
+    const tag = document.createElement('span');
+    tag.className = 'modality-tag';
+    tag.textContent = modality === 'image' ? 'image input' : 'text input';
+    modalityTagsEl.appendChild(tag);
   });
 }
 
 function updateImageUploadVisibility() {
-  const supportsImage = (MODEL_MODALITIES[modelSelect.value] || []).includes('image');
-  if (imageUploadSection) imageUploadSection.classList.toggle('hidden', !supportsImage);
-  if (!supportsImage && typeof clearSourceImage === 'function') clearSourceImage();
+  const modalities = MODEL_MODALITIES[CURRENT_MODEL] || MODEL_MODALITIES[modelSelect.value] || ['text'];
+  const supportsImage = modalities.includes('image');
+
+  if (imageUploadSection) {
+    imageUploadSection.classList.toggle('hidden', !supportsImage);
+  }
+
+  if (!supportsImage && typeof clearSourceImage === 'function') {
+    clearSourceImage();
+  }
 }
 
 function updateModelUI() {
@@ -528,22 +506,117 @@ function updateModelUI() {
   updateImageUploadVisibility();
 }
 
-// Load immediately + refresh every 15 minutes
+function addModelOption(group, model) {
+  const modelName = getModelName(model);
+  if (!modelName) return;
+
+  const label = getModelLabel(model);
+  const option = document.createElement('option');
+
+  option.value = modelName;
+  option.textContent = label + (model.paid_only ? ' (paid only)' : '');
+  option.dataset.modelName = modelName;
+
+  MODEL_INFO[modelName] = model.paid_only
+    ? `${label} — paid plan required.`
+    : label;
+
+  MODEL_MODALITIES[modelName] = Array.isArray(model.input_modalities) && model.input_modalities.length
+    ? model.input_modalities
+    : ['text'];
+
+  group.appendChild(option);
+}
+
+function buildModelGroup(models, label) {
+  if (!models.length) return null;
+
+  const group = document.createElement('optgroup');
+  group.label = label;
+
+  models.forEach((model) => addModelOption(group, model));
+
+  return group.children.length ? group : null;
+}
+
+function loadFallbackModels() {
+  const fallbackModels = [
+    { name: 'flux', description: 'Flux Schnell - fast high-quality image generation', input_modalities: ['text'], paid_only: false },
+    { name: 'zimage', description: 'Z-Image Turbo - fast image generation', input_modalities: ['text'], paid_only: false },
+    { name: 'gptimage-mini', description: 'GPT Image 1 Mini - OpenAI image generation', input_modalities: ['text', 'image'], paid_only: false },
+    { name: 'qwen-image', description: 'Qwen Image Plus - Alibaba text-to-image and editing', input_modalities: ['text', 'image'], paid_only: false },
+    { name: 'wan-image', description: 'Wan Image - Alibaba text-to-image', input_modalities: ['text', 'image'], paid_only: false },
+    { name: 'gptimage-large', description: 'GPT Image 1.5 - OpenAI advanced image generation', input_modalities: ['text', 'image'], paid_only: false },
+    { name: 'kontext', description: 'FLUX.1 Kontext - in-context editing and generation', input_modalities: ['text', 'image'], paid_only: false },
+    { name: 'p-image', description: 'Pruna p-image - fast text-to-image', input_modalities: ['text'], paid_only: true },
+    { name: 'p-image-edit', description: 'Pruna p-image-edit - image editing', input_modalities: ['text', 'image'], paid_only: true },
+    { name: 'grok-imagine', description: 'Grok Imagine - xAI image generation', input_modalities: ['text'], paid_only: true },
+    { name: 'nanobanana', description: 'NanoBanana - Gemini Flash Image', input_modalities: ['text', 'image'], paid_only: true },
+    { name: 'nova-canvas', description: 'Amazon Nova Canvas - Bedrock Image', input_modalities: ['text', 'image'], paid_only: true }
+  ];
+
+  renderModels(fallbackModels);
+}
+
+function renderModels(models) {
+  const previousModel =
+    CURRENT_MODEL ||
+    localStorage.getItem('__pig_model') ||
+    modelSelect.value ||
+    'flux';
+
+  modelSelect.innerHTML = '';
+  MODEL_INFO = {};
+  MODEL_MODALITIES = {};
+
+  const imageModels = models.filter((model) => {
+    const output = Array.isArray(model.output_modalities) ? model.output_modalities : ['image'];
+    return output.includes('image') && !output.includes('video');
+  });
+
+  const freeModels = imageModels.filter((model) => !model.paid_only);
+  const paidModels = imageModels.filter((model) => model.paid_only);
+
+  const freeGroup = buildModelGroup(freeModels, 'Free Models');
+  const paidGroup = buildModelGroup(paidModels, 'Paid Models');
+
+  if (freeGroup) modelSelect.appendChild(freeGroup);
+  if (paidGroup) modelSelect.appendChild(paidGroup);
+
+  setSelectedModelName(previousModel, false);
+}
+
+async function loadModels() {
+  try {
+    const response = await fetch('https://gen.pollinations.ai/image/models', {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      throw new Error('HTTP ' + response.status);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error('Expected JSON models response, got: ' + contentType);
+    }
+
+    const models = await response.json();
+
+    if (!Array.isArray(models)) {
+      throw new Error('Models response is not an array');
+    }
+
+    renderModels(models);
+  } catch (error) {
+    console.warn('Model load failed:', error);
+    loadFallbackModels();
+  }
+}
+
+modelSelect.addEventListener('change', () => {
+  setSelectedModelName(modelSelect.value, true);
+});
+
 loadModels();
 setInterval(loadModels, 15 * 60 * 1000);
-
-
-const modelInfo = document.createElement('p');
-modelInfo.style.cssText = 'font-size:.76rem;color:var(--clr-muted);margin-top:.35rem;min-height:1.1em;';
-modelSelect.parentElement.appendChild(modelInfo);
-modelSelect.parentElement.appendChild(modalityTagsEl);
-window._modelInfoEl = modelInfo;
-
-function updateModelInfo() {
-  modelInfo.textContent = MODEL_INFO[modelSelect.value] || '';
-}
-modelSelect.addEventListener('change', () => {
-  localStorage.setItem('__pig_model', modelSelect.value);
-  updateModelUI();
-});
-updateModelInfo();
