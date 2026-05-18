@@ -236,6 +236,8 @@ if (_removeBtn) {
     clearSourceImage();
   });
 }
+);
+}
 
 // Drag & drop on the label/area
 const _dropArea = document.getElementById('image-drop-area');
@@ -246,8 +248,9 @@ if (_dropArea) {
     _dropArea.classList.add('drag-over');
   });
   _dropArea.addEventListener('dragleave', e => {
-    e.stopPropagation();
-    _dropArea.classList.remove('drag-over');
+    if (!_dropArea.contains(e.relatedTarget)) {
+      _dropArea.classList.remove('drag-over');
+    }
   });
   _dropArea.addEventListener('drop', e => {
     e.preventDefault();
@@ -258,63 +261,6 @@ if (_dropArea) {
   });
 }
 
-// ── Generate image ────────────────────────────────────────
-async function generateImage() {
-  const prompt = promptInput.value.trim();
-  if (!prompt) { showError('Please enter a prompt before generating.'); return; }
-
-  const apiKey = loadApiKey();
-  if (!apiKey) { clearApiKey(); showSetupScreen(); return; }
-
-  const model  = modelSelect.value;
-  const width  = Math.max(64, Math.min(2048, parseInt(widthInput.value)  || 1024));
-  const height = Math.max(64, Math.min(2048, parseInt(heightInput.value) || 1024));
-  const seed   = seedInput.value?.toString().trim() || '';
-  const nologo = nologoChk.checked;
-
-  setLoading(true);
-  showOutput('loading');
-
-  try {
-    let imageUrl;
-
-    if (currentSourceFile) {
-      // POST with FormData for models that accept image input
-      const encoded  = encodeURIComponent(prompt);
-      const endpoint = `https://gen.pollinations.ai/image/${encoded}`;
-      const qs = new URLSearchParams({ model, width, height, key: apiKey, nologo: String(nologo) });
-      if (seed) qs.set('seed', seed);
-
-      const form = new FormData();
-      form.append('image', currentSourceFile, currentSourceFile.name);
-
-      const resp = await fetch(`${endpoint}?${qs}`, { method: 'POST', body: form });
-      if (!resp.ok) {
-        const txt = await resp.text().catch(() => resp.statusText);
-        throw new Error(`API error ${resp.status}: ${txt.slice(0, 150)}`);
-      }
-      const blob = await resp.blob();
-      imageUrl = URL.createObjectURL(blob);
-
-    } else {
-      // GET for text-only generation
-      imageUrl = buildImageUrl({ prompt, model, width, height, seed, nologo, apiKey });
-    }
-
-    await new Promise((resolve, reject) => {
-      const img  = new Image();
-      img.onload = () => { generatedImg.src = imageUrl; currentImageUrl = imageUrl; resolve(); };
-      img.onerror= () => reject(new Error('Image generation failed. Check your API key or try a different prompt.'));
-      img.src    = imageUrl;
-    });
-
-    showOutput('image');
-  } catch (err) {
-    showError(err.message);
-  } finally {
-    setLoading(false);
-  }
-}
 
 generateBtn.addEventListener('click', generateImage);
 regenBtn.addEventListener('click', generateImage);
