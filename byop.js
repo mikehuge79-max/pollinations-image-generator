@@ -2,12 +2,12 @@
   const POLLINATIONS_APP_CLIENT_ID = "pk_jymkK5wZB9aVFWUh";
   const BYOP_STATE_KEY = "__pig_byop_state";
 
-  // Дублируем формат хранения из app.js, чтобы byop.js не зависел от const внутри app.js
+  // Match the app.js localStorage key format without depending on app.js constants.
   const STORAGE_KEY = "__pig_k";
   const XOR_SEED = 0x5A;
 
   function encodeKey(rawKey) {
-    const bytes = Array.from(rawKey).map(c => c.charCodeAt(0) ^ XOR_SEED);
+    const bytes = Array.from(rawKey).map((char) => char.charCodeAt(0) ^ XOR_SEED);
     return btoa(String.fromCharCode(...bytes));
   }
 
@@ -24,7 +24,7 @@
 
     if (window.crypto && window.crypto.getRandomValues) {
       window.crypto.getRandomValues(bytes);
-      return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+      return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
     }
 
     return String(Date.now()) + Math.random().toString(16).slice(2);
@@ -74,20 +74,44 @@
 
     if (apiKey) {
       saveGeneratedUserKey(apiKey);
-
-      if (typeof window.showMainApp === "function") {
-        window.showMainApp(apiKey);
-      } else {
-        window.location.reload();
-      }
+      window.location.reload();
     }
   }
 
   function addConnectButton() {
-    if (document.getElementById("connect-pollen-btn")) return;
+    if (document.getElementById("connect-pollen-block")) return;
 
     const saveKeyBtn = document.getElementById("save-key-btn");
     if (!saveKeyBtn) return;
+
+    const inputRow = saveKeyBtn.closest(".setup-input-row");
+    if (!inputRow || !inputRow.parentElement) return;
+
+    const block = document.createElement("div");
+    block.id = "connect-pollen-block";
+    block.style.cssText = "margin:1rem 0 1.25rem;width:100%;";
+
+    const divider = document.createElement("div");
+    divider.textContent = "OR";
+    divider.style.cssText = [
+      "display:flex",
+      "align-items:center",
+      "gap:.75rem",
+      "margin:.5rem 0 .85rem",
+      "color:var(--clr-muted)",
+      "font-size:.75rem",
+      "font-weight:700",
+      "letter-spacing:.08em"
+    ].join(";");
+
+    const leftLine = document.createElement("span");
+    leftLine.style.cssText = "height:1px;background:var(--clr-border);flex:1;";
+
+    const rightLine = document.createElement("span");
+    rightLine.style.cssText = "height:1px;background:var(--clr-border);flex:1;";
+
+    divider.prepend(leftLine);
+    divider.append(rightLine);
 
     const btn = document.createElement("button");
     btn.type = "button";
@@ -95,24 +119,31 @@
     btn.textContent = "🌸 Connect Pollinations account";
     btn.style.cssText = [
       "width:100%",
-      "margin-top:.75rem",
+      "display:block",
       "padding:.85rem 1rem",
       "border-radius:12px",
       "border:1px solid rgba(167,115,255,.45)",
       "background:linear-gradient(135deg,#a855f7,#6366f1)",
       "color:#fff",
       "font-weight:700",
-      "cursor:pointer"
+      "cursor:pointer",
+      "white-space:normal",
+      "line-height:1.25"
     ].join(";");
 
     const hint = document.createElement("p");
-    hint.textContent = "Recommended: authorize this app and use your own Pollen balance.";
-    hint.style.cssText = "font-size:.76rem;color:var(--clr-muted);margin:.5rem 0 0;line-height:1.4;";
+    hint.textContent = "Authorize this app and use your own Pollen balance.";
+    hint.style.cssText = [
+      "font-size:.76rem",
+      "color:var(--clr-muted)",
+      "margin:.5rem 0 0",
+      "line-height:1.4"
+    ].join(";");
 
     btn.addEventListener("click", startPollinationsAuth);
 
-    saveKeyBtn.insertAdjacentElement("afterend", btn);
-    btn.insertAdjacentElement("afterend", hint);
+    block.append(divider, btn, hint);
+    inputRow.insertAdjacentElement("afterend", block);
   }
 
   handlePollinationsRedirect();
