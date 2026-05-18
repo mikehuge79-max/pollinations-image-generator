@@ -195,6 +195,69 @@ function buildImageUrl(params) {
   return `${base}?${qs.toString()}`;
 }
 
+// ── Image upload handlers ───────────────────────────────
+function clearSourceImage() {
+  currentSourceFile = null;
+  const wrap = document.getElementById('image-preview-wrap');
+  const ph   = document.getElementById('image-upload-placeholder');
+  const prev = document.getElementById('source-image-preview');
+  const inp  = document.getElementById('image-file-input');
+  if (wrap) wrap.classList.add('hidden');
+  if (ph)   ph.classList.remove('hidden');
+  if (prev) prev.src = '';
+  if (inp)  inp.value = '';
+}
+
+function applySourceFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  currentSourceFile = file;
+  const wrap = document.getElementById('image-preview-wrap');
+  const ph   = document.getElementById('image-upload-placeholder');
+  const prev = document.getElementById('source-image-preview');
+  if (prev) prev.src = URL.createObjectURL(file);
+  if (ph)   ph.classList.add('hidden');
+  if (wrap) wrap.classList.remove('hidden');
+}
+
+// File input change (works for both click-via-label and drag&drop)
+const _fileInput = document.getElementById('image-file-input');
+if (_fileInput) {
+  _fileInput.addEventListener('change', e => {
+    if (e.target.files && e.target.files[0]) applySourceFile(e.target.files[0]);
+  });
+}
+
+// Remove button — prevent label from re-opening file picker
+const _removeBtn = document.getElementById('remove-image-btn');
+if (_removeBtn) {
+  _removeBtn.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    clearSourceImage();
+  });
+}
+
+// Drag & drop on the label/area
+const _dropArea = document.getElementById('image-drop-area');
+if (_dropArea) {
+  _dropArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    _dropArea.classList.add('drag-over');
+  });
+  _dropArea.addEventListener('dragleave', e => {
+    e.stopPropagation();
+    _dropArea.classList.remove('drag-over');
+  });
+  _dropArea.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    _dropArea.classList.remove('drag-over');
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) applySourceFile(file);
+  });
+}
+
 // ── Generate image ────────────────────────────────────────
 async function generateImage() {
   const prompt = promptInput.value.trim();
